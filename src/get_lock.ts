@@ -1,4 +1,8 @@
 
+/* IMPORT */
+
+import {ID, LockOptions} from './types';
+
 /* GET LOCK */
 
 function getLock ( id: ID, timeout: number, options: LockOptions ) {

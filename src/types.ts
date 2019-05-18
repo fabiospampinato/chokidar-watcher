@@ -31,3 +31,7 @@ type Handlers = {
   rename?: ( prevFilePath: string, nextFilePath: string ) => void,
   unlink?: ( filePath: string ) => void
 };
+
+/* EXPORT */
+
+export {ID, Event, Stats, Locks, LockOptions, Handlers};

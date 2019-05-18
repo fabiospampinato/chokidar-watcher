@@ -2,6 +2,7 @@
 /* IMPORT */
 
 import * as fs from 'fs';
+import {ID, Stats} from './types';
 
 /* GET ID */
 

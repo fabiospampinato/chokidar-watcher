@@ -4,6 +4,7 @@
 import * as chokidar from 'chokidar';
 import {FSWatcher, WatchOptions} from 'chokidar';
 import * as fs from 'fs';
+import {Event, Locks, Handlers} from './types';
 import {RENAME_TIMEOUT} from './consts';
 import getID from './get_id';
 import getLock from './get_lock';
