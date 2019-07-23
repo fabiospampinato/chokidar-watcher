@@ -6,12 +6,23 @@ import {ID, Stats} from './types';
 
 /* GET ID */
 
+let isStatsReliable: boolean; // Under Windows we need stats objects using bigints https://github.com/nodejs/node/issues/12115
+
 const statsCache: Stats = {}; //TODO: These values shouldn't be kept forever, or this could eventually become a memory leak
 
 function getID ( filePath: string, stats?: fs.Stats ): ID {
 
-  // stats = stats || statsCache[filePath]; //TODO: We can't use chokidar-provided stats objects yet, as they don't use BigInts https://github.com/paulmillr/chokidar/issues/844
-  stats = statsCache[filePath];
+  if ( stats ) {
+
+    if ( typeof isStatsReliable !== 'boolean' ) isStatsReliable = ( process.platform !== 'win32' ) || typeof stats.ino === 'bigint';
+
+    stats = isStatsReliable ? stats : statsCache[filePath];
+
+  } else {
+
+    stats = statsCache[filePath];
+
+  }
 
   if ( !stats ) {
 
