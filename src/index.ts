@@ -51,7 +51,13 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handlers
       },
       handlers: {
         free: () => emit ( 'add', [filePath, stats] ),
-        override: ( prevPath: string ) => emit ( 'rename', [prevPath, filePath] ),
+        override: ( prevPath: string ) => {
+          if ( prevPath === filePath ) {
+            emit ( 'change', [filePath] );
+          } else {
+            emit ( 'rename', [prevPath, filePath] )
+          }
+        },
         overridden: () => filePath
       }
     });
@@ -69,7 +75,13 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handlers
       },
       handlers: {
         free: () => emit ( 'unlink', [filePath] ),
-        override: ( newPath: string ) => emit ( 'rename', [filePath, newPath] ),
+        override: ( newPath: string ) => {
+          if ( filePath === newPath ) {
+            emit ( 'change', [filePath] );
+          } else {
+            emit ( 'rename', [filePath, newPath] )
+          }
+        },
         overridden: () => filePath
       }
     });
