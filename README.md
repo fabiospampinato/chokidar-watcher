@@ -15,6 +15,8 @@ npm install --save chokidar-watcher
 This library provides the following interface:
 
 ```ts
+type Handler = ( filePath: string, nextFilePathOrStats?: import ( 'fs' ).Stats | string ) => void;
+
 type Handlers = {
   add?: ( filePath: string, stats: fs.Stats ) => void,
   change?: ( filePath: string, stats: fs.Stats ) => void,
@@ -22,6 +24,7 @@ type Handlers = {
   unlink?: ( filePath: string ) => void
 };
 
+function watcher ( paths: ChokidarPaths, options: ChokidarOptions, handler: Handler ): ChokidarWatcher // Basically the same API as chokidar, plus the "handler" function which will handle all events
 function watcher ( paths: ChokidarPaths, options: ChokidarOptions, handlers: Handlers ): ChokidarWatcher // Basically the same API as chokidar, plus the "handlers" object
 ```
 

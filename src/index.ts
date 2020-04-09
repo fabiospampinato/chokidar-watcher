@@ -4,7 +4,7 @@
 import * as chokidar from 'chokidar';
 import {FSWatcher, WatchOptions} from 'chokidar';
 import * as fs from 'fs';
-import {Event, Locks, Handlers} from './types';
+import {Event, Locks, Handler, Handlers} from './types';
 import {RENAME_TIMEOUT} from './consts';
 import getID from './get_id';
 import getLock from './get_lock';
@@ -13,7 +13,20 @@ import getLock from './get_lock';
 
 //TODO: Write a test suite
 
-function watcher ( paths: string, options: WatchOptions = {}, handlers: Handlers = {} ): FSWatcher {
+function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler | Handlers = {} ): FSWatcher {
+
+  /* UNIVERSAL HANDLER */
+
+  if ( typeof handlers === 'function' ) {
+
+    return watcher ( paths, options, {
+      add: handlers,
+      change: handlers,
+      rename: handlers,
+      unlink: handlers
+    });
+
+  }
 
   /* VARIABLES */
 

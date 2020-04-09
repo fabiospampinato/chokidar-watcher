@@ -25,6 +25,8 @@ type LockOptions = {
   }
 };
 
+type Handler = ( filePath: string, nextFilePathOrStats?: import ( 'fs' ).Stats | string ) => void;
+
 type Handlers = {
   add?: ( filePath: string, stats: import ( 'fs' ).Stats ) => void,
   change?: ( filePath: string, stats: import ( 'fs' ).Stats ) => void,
@@ -34,4 +36,4 @@ type Handlers = {
 
 /* EXPORT */
 
-export {ID, Event, Stats, Locks, LockOptions, Handlers};
+export {ID, Event, Stats, Locks, LockOptions, Handler, Handlers};
