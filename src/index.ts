@@ -55,7 +55,10 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler 
 
   function add ( filePath: string, stats?: Stats ) {
 
-    const id = getID ( ids, filePath, stats );
+    const isInitial = !( filePath in ids ),
+          id = getID ( ids, filePath, stats );
+
+    if ( options.ignoreInitial && isInitial ) return; // Ignoring initial, while still registering it
 
     getLock ( id, RENAME_TIMEOUT, {
       locks: {
