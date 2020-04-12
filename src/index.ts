@@ -3,8 +3,7 @@
 
 import * as chokidar from 'chokidar';
 import {FSWatcher, WatchOptions} from 'chokidar';
-import * as fs from 'fs';
-import {Event, Locks, Handler, Handlers} from './types';
+import {IDs, Event, Locks, Handler, Handlers, Stats} from './types';
 import {RENAME_TIMEOUT} from './consts';
 import getID from './get_id';
 import getLock from './get_lock';
@@ -30,8 +29,9 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler 
 
   /* VARIABLES */
 
-  const locksAdd: Locks = {},
-        locksUnlink: Locks = {};
+  let ids: IDs = {},
+      locksAdd: Locks = {},
+      locksUnlink: Locks = {};
 
   /* HELPERS */
 
@@ -47,15 +47,15 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler 
 
   /* HANDLERS */
 
-  function change ( filePath: string, stats?: fs.Stats ) {
+  function change ( filePath: string, stats?: Stats ) {
 
     emit ( 'change', [filePath, stats] );
 
   }
 
-  function add ( filePath: string, stats?: fs.Stats ) {
+  function add ( filePath: string, stats?: Stats ) {
 
-    const id = getID ( filePath, stats );
+    const id = getID ( ids, filePath, stats );
 
     getLock ( id, RENAME_TIMEOUT, {
       locks: {
@@ -79,7 +79,7 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler 
 
   function unlink ( filePath: string ) {
 
-    const id = getID ( filePath );
+    const id = getID ( ids, filePath );
 
     getLock ( id, RENAME_TIMEOUT, {
       locks: {
@@ -103,9 +103,26 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler 
 
   /* CHOKIDAR */
 
-  const chokidarOptions = Object.assign ( {}, options, { ignoreInitial: false } );
+  const chokidarOptions = Object.assign ( {}, options, { ignoreInitial: false } ),
+        chokidarWatcher = chokidar.watch ( paths, chokidarOptions ).on ( 'add', add ).on ( 'change', change ).on ( 'unlink', unlink );
 
-  return chokidar.watch ( paths, chokidarOptions ).on ( 'add', add ).on ( 'change', change ).on ( 'unlink', unlink );
+  /* CLEANUP */
+
+  const _close = chokidarWatcher.close;
+
+  chokidarWatcher.close = () => {
+
+    ids = {};
+    locksAdd = {};
+    locksUnlink = {};
+
+    return _close.call ( chokidarWatcher );
+
+  };
+
+  /* RETURN */
+
+  return chokidarWatcher;
 
 }
 

@@ -3,15 +3,11 @@
 
 type ID = string | undefined;
 
+type IDs = Record<string, ID>;
+
 type Event = 'add' | 'change' | 'rename' | 'unlink';
 
-type Stats = {
-  [filePath: string]: import ( 'fs' ).Stats
-};
-
-type Locks = {
-  [id: string]: Function
-};
+type Locks = Record<string, Function>;
 
 type LockOptions = {
   locks: {
@@ -25,15 +21,17 @@ type LockOptions = {
   }
 };
 
-type Handler = ( filePath: string, nextFilePathOrStats?: import ( 'fs' ).Stats | string ) => void;
+type Handler = ( filePath: string, nextFilePathOrStats?: string | Stats ) => void;
 
 type Handlers = {
-  add?: ( filePath: string, stats: import ( 'fs' ).Stats ) => void,
-  change?: ( filePath: string, stats: import ( 'fs' ).Stats ) => void,
+  add?: ( filePath: string, stats: Stats ) => void,
+  change?: ( filePath: string, stats: Stats ) => void,
   rename?: ( prevFilePath: string, nextFilePath: string ) => void,
   unlink?: ( filePath: string ) => void
 };
 
+type Stats = import ( 'fs' ).Stats | import ( 'fs' ).BigIntStats;
+
 /* EXPORT */
 
-export {ID, Event, Stats, Locks, LockOptions, Handler, Handlers};
+export {ID, IDs, Event, Locks, LockOptions, Handler, Handlers, Stats};
