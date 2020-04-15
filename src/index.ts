@@ -30,6 +30,7 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler 
   /* VARIABLES */
 
   let ids: IDs = {},
+      isReady = false,
       locksAdd: Locks = {},
       locksUnlink: Locks = {};
 
@@ -47,6 +48,12 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler 
 
   /* HANDLERS */
 
+  function ready () {
+
+    isReady = true;
+
+  }
+
   function change ( filePath: string, stats?: Stats ) {
 
     emit ( 'change', [filePath, stats] );
@@ -55,10 +62,9 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler 
 
   function add ( filePath: string, stats?: Stats ) {
 
-    const isInitial = !( filePath in ids ),
-          id = getID ( ids, filePath, stats );
+    const id = getID ( ids, filePath, stats );
 
-    if ( options.ignoreInitial && isInitial ) return; // Ignoring initial, while still registering it
+    if ( options.ignoreInitial && !isReady ) return; // Ignoring initial, while still registering it
 
     getLock ( id, RENAME_TIMEOUT, {
       locks: {
@@ -107,7 +113,7 @@ function watcher ( paths: string, options: WatchOptions = {}, handlers: Handler 
   /* CHOKIDAR */
 
   const chokidarOptions = Object.assign ( {}, options, { ignoreInitial: false } ),
-        chokidarWatcher = chokidar.watch ( paths, chokidarOptions ).on ( 'add', add ).on ( 'change', change ).on ( 'unlink', unlink );
+        chokidarWatcher = chokidar.watch ( paths, chokidarOptions ).on ( 'ready', ready ).on ( 'add', add ).on ( 'change', change ).on ( 'unlink', unlink );
 
   /* CLEANUP */
 
