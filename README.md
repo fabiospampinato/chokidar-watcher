@@ -28,8 +28,6 @@ function watcher ( paths: ChokidarPaths, options: ChokidarOptions, handler: Hand
 function watcher ( paths: ChokidarPaths, options: ChokidarOptions, handlers: Handlers ): ChokidarWatcher // Basically the same API as chokidar, plus the "handlers" object
 ```
 
-- ℹ️ The only unsupported chokidar option is `ignoreInitial`, you can't set it to `false` because this library needs it for detecting renames.
-
 ## Usage
 
 ```ts
